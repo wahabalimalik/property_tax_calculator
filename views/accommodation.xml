@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action -->
+      <record model="ir.actions.act_window" 
+          id="property_tax_calculator.action_accommodation">
+
+          <field name="name">Accommodtaion</field>
+          <field name="res_model">accommodation</field>
+          <field name="view_mode">tree,form</field>
+      </record>
+
+    <!-- Menuitem -->
+      <menuitem 
+      	name="Accommodtaion" 
+      	id="property_tax_calculator.accommodation"
+  		  sequence='3'
+      	parent="property_tax_calculator.setting"
+        action="property_tax_calculator.action_accommodation"
+      />
+	
+</odoo>

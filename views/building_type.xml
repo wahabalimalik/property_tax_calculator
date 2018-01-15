@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action -->
+      <record model="ir.actions.act_window" 
+          id="property_tax_calculator.action_building_type">
+
+          <field name="name">Building Type</field>
+          <field name="res_model">building.type</field>
+          <field name="view_mode">tree,form</field>
+      </record>
+
+    <!-- Menuitem -->
+      <menuitem 
+      	name="Building Type" 
+      	id="property_tax_calculator.building_type"
+  		  sequence='1'
+      	parent="property_tax_calculator.setting"
+        action="property_tax_calculator.action_building_type"
+      />
+	
+</odoo>

@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- Main Building Template Form.-->
+    <record model="ir.ui.view" id="property_tax_calculator.build_data_form">
+      <field name="name">property_tax_calculator build_data_form</field>
+      <field name="model">building.data</field>
+      <field name="arch" type="xml">
+       	<form>
+
+          <header>
+            <button 
+              name="inits" 
+              class="oe_highlight" 
+              states="draft" 
+              string="Send for varification" 
+              type="object"
+            />
+
+            <button 
+              name="verified" 
+              class="oe_highlight" 
+              states="staging" 
+              string="Verify" 
+              type="object"
+            />
+
+            <button 
+              name="cancel" 
+              class="oe_highlight" 
+              states="staging" 
+              string="Send Back to Draft" 
+              type="object"
+            />
+
+            <button 
+              name="go_back_to_staging" 
+              class="oe_highlight" 
+              states="verified" 
+              string="Go Back to Staging" 
+              type="object"
+            />
+
+            <field 
+              name="state" 
+              widget="statusbar" 
+              statusbar_visible="draft,staging,verified"
+            />
+          </header>
+
+       		<sheet>
+
+       			<div class="oe_button_box" name="button_box"></div>
+       			<div class="oe_title">
+              <label class="oe_edit_only" for="name" string="Building Ref#"/>
+          		<h1>
+          			<field name="name" placeholder="Reference Number" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+          		</h1>
+                <div style="width: 60%;">
+                  <field name="type_id"/>
+                </div>
+            </div>
+
+          	<group>
+            	<group>
+                  <label for="street" string="Address"/>
+                  <div class="o_address_format">
+                    <field 
+                    	name="street" 
+                    	placeholder="Street..." 
+                    	class="o_address_street" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <field 
+                      name="street2" 
+                      placeholder="Street 2..." 
+                      class="o_address_street" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <field 
+                      name="ward" 
+                      placeholder="Ward..." 
+                      class="o_address_street" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <field 
+                      name="sub_ward" 
+                      placeholder="Sub Ward..." 
+                      class="o_address_street" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <field 
+                    	name="city" 
+                    	placeholder="City" 
+                    	class="o_address_city" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <field 
+                    	name="state_id" 
+                    	class="o_address_state" 
+                    	options="{&quot;no_open&quot;: True}"
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    	placeholder="State"
+                    />
+                    <field 
+                    	name="zip" 
+                    	placeholder="P Code" 
+                    	class="o_address_zip" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <field 
+                    	name="country_id" 
+                    	placeholder="Country" 
+                    	class="o_address_country" 
+                    	options='{"no_open": True,
+                    	 "no_create": True
+                    	 }'
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                  </div>
+              </group>
+              <group>
+              	<field name="property_name" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                <field name="plot_number" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                <field name="standard_cost" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+              	<field name="view_data_valuation" attrs="{'readonly': [('state', '=', 'verified')]}" invisible='1'/>
+              </group>
+            </group>
+
+            <notebook>
+
+              <page string="Owners">
+                <field name="owner_id" attrs="{'readonly': [('state', '=', 'verified')]}">
+                  <tree string="Owners" editable="bottom">
+                    <field name="name"/>
+                    <field name="identification_id"/>
+                    <field name="area_own"/>
+                  </tree>
+                </field>
+              </page>
+
+              <page string="Data Sheet">
+                <group>
+                  <button 
+                    name="create_build_data"  
+                    class="btn-primary" 
+                    string="Update Information" 
+                    type="object"
+                    />
+                </group>
+
+                <group>
+                  <group>
+                    <field name="tenure" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="state_of_build" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="roof" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="ceiling" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="walls" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="windows" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="condition" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </group>
+                  <group>
+                    <field name="doors" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="floor" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="services" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="main_building" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="out_building" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="depreciation" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="building_level" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="building_material" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </group>
+                </group>
+
+                <notebook>
+
+                  <page string="Accommodation">
+                    <field name="room_counts" attrs="{'readonly': [('state', '=', 'verified')]}">
+                      <tree editable="bottom">
+                        <field name="name"/>
+                        <field name="quantity"/>
+                      </tree>
+                    </field>
+                  </page>
+                  <page string="Fitting and Fixture">
+                    <field name="fixture_and_fittng" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </page>
+                  <page string="Site Work">
+                    <field name="site_work" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </page>
+                  <page string="Main Building Description">
+                    <field name="main_description" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </page>
+                  <page string="Out Building Description">
+                    <field name="out_description" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </page>
+
+                </notebook>
+              </page>
+
+              <page 
+                string="Data Valuation" 
+                attrs="{'invisible': [('view_data_valuation', '!=', True)]}">
+
+                <group>
+                  <group>
+                    <field name="surface_area" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="total_area" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="rate_per_meter_square" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="replacement_cost" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="depreciation_factor" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </group>
+                  <group>
+                    <field name="depreciated_replacement_cost" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="site_works" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="rateable_value" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                    <field name="say" attrs="{'readonly': [('state', '=', 'verified')]}"/>
+                  </group>
+                </group>
+              </page>
+
+            </notebook>
+       		</sheet>
+       	</form>
+      </field>
+    </record>
+
+  <!-- Main Building Template Tree.-->
+    <record model="ir.ui.view" id="property_tax_calculator.build_data_tree">
+      <field name="name">property_tax_calculator build_data_tree</field>
+      <field name="model">building.data</field>
+      <field name="arch" type="xml">
+        <tree 
+          decoration-muted="state == 'draft'"
+          decoration-info="state == 'staging'" 
+          decoration-success="state == 'verified'"
+          >
+          <field name="name"/>
+          <field name="total_area"/>
+          <field name="state"/>
+          <field name="say"/>
+        </tree>
+      </field>
+    </record>
+
+  <!-- Main Building Template Search.-->
+    <record model="ir.ui.view" id="property_tax_calculator.build_data_search">
+      <field name="name">property_tax_calculator build_data_search</field>
+      <field name="model">building.data</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="total_area"/>
+          <field name="city"/>
+          <field name="building_level"/>
+          <field name="type_id"/>
+          <filter 
+            name="draft"
+            string="Draft"
+            domain="[('state', '=', 'draft')]"
+          />
+          <filter 
+            name="staging"
+            string="Staging"
+            domain="[('state', '=', 'staging')]"
+          />
+          <filter 
+            name="verified"
+            string="Verified"
+            domain="[('state', '=', 'verified')]"
+          />
+        </search>
+      </field>
+    </record>
+
+  <!-- Action -->
+    <record
+      model="ir.actions.act_window" 
+      id="property_tax_calculator.action_building">
+
+      <field name="name">Building</field>
+      <field name="res_model">building.data</field>
+      <field name="context">{'search_default_staging':1}</field>
+      <field name="help" type="html">
+        <p class="oe_view_nocontent_create">
+          Click to create a Building.
+        </p><p>
+        	Here you are allows to Inroll new building and 
+        	link it with all other information related to 
+        	that building.
+        </p>
+      </field>
+      <field name="view_mode">tree,form</field>
+      <field 
+        name="search_view_id" 
+        ref="property_tax_calculator.build_data_search" 
+      />
+    </record>
+
+  <!-- Menuitem -->
+    <menuitem 
+      name="Building" 
+      id="property_tax_calculator.building"
+      sequence='1'
+      parent="property_tax_calculator.menu_1"
+      action="property_tax_calculator.action_building"
+    />
+	
+</odoo>

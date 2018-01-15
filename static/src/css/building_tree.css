@@ -1,0 +1,4 @@
+@charset "utf-8";
+.o_text_center_for_building > div > table > tbody {
+	text-align: left !important;
+}
