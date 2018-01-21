@@ -6,7 +6,7 @@ class ResPartnerOwner(models.Model):
 	_inherit = 'res.partner'
 
 	#####################################################
-	# Below varibles are relation with Building.
+	# Below varibles are res.partner relation with Building.
 	#####################################################
 
 	owner = fields.Boolean(readonly=True)
@@ -32,6 +32,7 @@ class ResPartnerOwner(models.Model):
 	], string='Marital Status')
 
 	birthday = fields.Date('Date of Birth')
+	citizen = fields.Boolean(default=True)
 
 	#####################################################
 	# Below varible is relation of owner with partner.
@@ -44,15 +45,13 @@ class ResPartnerOwner(models.Model):
 	# which we want to upload to OSM database.
 	#####################################################
 
-	bus_id = fields.Many2one('building.data',string="Business ID")
+	building_id = fields.One2many('owner.building.line','owner_form_id',readonly=True)
 
-	citizen = fields.Boolean(default=True)
 	vrn = fields.Integer('VRN')
+	tin = fields.Integer('TIN')
+	efd = fields.Integer('EFD')
 	assess = fields.Boolean()
 	branch = fields.Boolean('Branch')
-	tax = fields.Float(compute='_compute_tax',string='Total Tenant Tax')
-	tin = fields.Char('TIN')
-	efd = fields.Char('EFD')
 	valued = fields.Char('Valued')
 	
 
@@ -66,10 +65,8 @@ class ResPartnerOwner(models.Model):
 	#  pushing to OSM.
 	#####################################################
 
-	area_own = fields.Float()
-	building = fields.Char(compute='_compute_building')
-	property_valuation = fields.Float(compute='_compute_valuation',string='Property Valuation')
-	property_tax = fields.Float(compute='_compute_tax',string='Property Tax')
+	total_area_own = fields.Float(compute='_compute_area_own')
+	total_property_tax = fields.Float(string='Property Tax',compute='_compute_area_own')
 	
 	#####################################################
 	# This is unique killbill ID of Owner for charging 
@@ -79,42 +76,32 @@ class ResPartnerOwner(models.Model):
 	killbill_id = fields.Char('KillBill ID')
 
 	#####################################################
-	# Below function is for computing building type
-	#  e.g(residential or commercial). form reading buil-
-	#  -ding information
+	# Below function is for computing total area own
+	# by owner and total property tax
 	####################################################
 
 	@api.one
-	@api.depends('bus_id.type_id')
-	def _compute_building(self):
-		if self.bus_id.type_id:
-			self.building = self.bus_id.type_id
+	@api.depends('building_id')
+	def _compute_area_own(self):
+		if self.building_id:
+			self.total_area_own = sum(x.area_own for x in self.building_id)
+			self.total_property_tax = sum(x.property_tax for x in self.building_id)
 
-	#####################################################
-	# Below function is for calculating property tax
-	# with respect to building type 
-	# e.g(residential or commercial) and property 
-	# replacement value.
-	####################################################
+class OwnerBuildingLine(models.Model):
+	_name = 'owner.building.line'
+	_description = "This class is bridge between Owners and Building"
 
-	@api.one
-	@api.depends('property_valuation','building')
-	def _compute_tax(self):
-		if self.property_valuation and self.building:
-			if 'commercial' in self.building:
-				self.property_tax = self.property_valuation * 0.20 / 100
-			else:
-				self.property_tax = self.property_valuation * 0.15 / 100
-	#####################################################
-	# Below function is for auto caculation of property
-	# value it depend on area own by owner
-	####################################################
+	name = fields.Many2one('building.data')
+	property_name = fields.Char()
+	area_own = fields.Float()
+	property_value = fields.Float()
+	property_tax = fields.Float()
 
-	@api.one
-	@api.depends('area_own')
-	def _compute_valuation(self):
-		if self.area_own:
-			self.property_valuation = float(self.area_own) * 50000
+	##########################################
+	# Connection inverse fields
+	##########################################
+
+	owner_form_id = fields.Many2one('res.partner')
 
 class OwnerTanentLine(models.Model):
 	_name = 'owner.tanent.line'

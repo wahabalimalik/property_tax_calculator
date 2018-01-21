@@ -135,6 +135,7 @@
                     <field name="name"/>
                     <field name="identification_id"/>
                     <field name="area_own"/>
+                    <field name="type_id"/>
                   </tree>
                 </field>
               </page>

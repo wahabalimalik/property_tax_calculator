@@ -57,10 +57,6 @@ class BuildingData(models.Model):
 
 	owner_id = fields.One2many('building.owner.line','building_data_id')
 
-	@api.depends('owner_id.name')
-	def _onchange_owner_id(self):
-		print "kkkkkkkkkkkkkkkkkkkkk"
-
 	#####################################################
 	# Below varibles are building information
 	# which we want to upload to database.
@@ -219,11 +215,11 @@ class BuildingData(models.Model):
 
 		for rec in data['elements']:
 			if rec['type'] == 'way':
-				self.type_id = rec['tags']['building']
-				self.property_name = rec['tags']['name']
-				self.street2 = rec['tags']['addr:street']
-				self.building_level = rec['tags']['building:levels']
-				self.building_material = rec['tags']['building:material']
+				self.type_id = rec['tags']['building'] if 'building' in rec['tags'] else "Nr"
+				self.property_name = rec['tags']['name'] if 'name' in rec['tags'] else "Nr"
+				self.street2 = rec['tags']['addr:street'] if 'addr:street' in rec['tags'] else "Nr"
+				self.building_level = rec['tags']['building:levels'] if 'building:levels' in rec['tags'] else "Nr"
+				self.building_material = rec['tags']['building:material'] if 'building:material' in rec['tags'] else "Nr"
 				break
 
 		self.surface_area = projected_area
@@ -237,10 +233,13 @@ class BuildingData(models.Model):
 			else:
 				number_of_owner = len(self.owner_id)
 				area_already_specified = sum(x.area_own for x in self.owner_id)
-				no_f_ownr_alrdy_spcfid = self.owner_id.search_count([('area_own','!=',0)])
 				remaining_area = self.total_area - area_already_specified
+				no_f_ownr_alrdy_spcfid_area = 0
+				for x in self.owner_id:
+					if x.area_own !=0:
+						no_f_ownr_alrdy_spcfid_area = no_f_ownr_alrdy_spcfid_area + 1
 
-				if number_of_owner == no_f_ownr_alrdy_spcfid and remaining_area > 0:
+				if number_of_owner == no_f_ownr_alrdy_spcfid_area and remaining_area > 0:
 					raise ValidationError(_("Almost %s square foot area is unspecified.Please allocate it") 
 						%(remaining_area))
 
@@ -249,7 +248,10 @@ class BuildingData(models.Model):
 
 				for rec in self.owner_id:
 					if rec.area_own == 0:
-						rec.area_own = remaining_area / (number_of_owner - no_f_ownr_alrdy_spcfid)
+						rec.area_own = remaining_area / (number_of_owner - no_f_ownr_alrdy_spcfid_area)
+
+					if self.type_id == "commercial" or self.type_id == "residential" or self.type_id == "construction":
+						rec.type_id = self.type_id
 
 		else:
 			raise ValidationError(_("Please assign owners of Building First"))
@@ -349,6 +351,7 @@ class BuildingData(models.Model):
 	@api.one
 	@api.depends('rate_per_meter_square','total_area')
 	def _compute_replacement_cost(self):
+
 		self.replacement_cost = self.rate_per_meter_square * self.total_area
 
 	@api.one
@@ -372,8 +375,11 @@ class BuildingData(models.Model):
 			if self.owner_id:
 				number_of_owner = len(self.owner_id)
 				area_already_specified = sum(x.area_own for x in self.owner_id)
-				no_f_ownr_alrdy_spcfid = self.owner_id.search_count([('area_own','!=',0)])
 				remaining_area = self.total_area - area_already_specified
+				no_f_ownr_alrdy_spcfid_area = 0
+				for x in self.owner_id:
+					if x.area_own !=0:
+						no_f_ownr_alrdy_spcfid_area = no_f_ownr_alrdy_spcfid_area + 1
 
 				if remaining_area > 0:
 					raise ValidationError(_("Almost %s square foot area is unspecified.Please allocate it") 
@@ -381,6 +387,12 @@ class BuildingData(models.Model):
 
 				if round(area_already_specified,3) > round(self.total_area,3):
 					raise ValidationError(_("Area allocated to Owners is greater then Total area of Building"))
+
+				for rec in self.owner_id:
+					if rec.type_id == False:
+						raise ValidationError(_("Please type property type of your owner: %s" %(rec.name.name)))
+					if rec.type_id not in self.type_id:
+						raise ValidationError(_("Type : %s for owner :%s is not valid." %(rec.type_id,rec.name.name)))
 
 				self.write({'state': 'staging'})
 
@@ -395,8 +407,11 @@ class BuildingData(models.Model):
 			if self.owner_id:
 				number_of_owner = len(self.owner_id)
 				area_already_specified = sum(x.area_own for x in self.owner_id)
-				no_f_ownr_alrdy_spcfid = self.owner_id.search_count([('area_own','!=',0)])
 				remaining_area = self.total_area - area_already_specified
+				no_f_ownr_alrdy_spcfid_area = 0
+				for x in self.owner_id:
+					if x.area_own !=0:
+						no_f_ownr_alrdy_spcfid_area = no_f_ownr_alrdy_spcfid_area + 1
 
 				if remaining_area > 0:
 					raise ValidationError(_("Almost %s square foot area is unspecified.Please allocate it") 
@@ -405,14 +420,34 @@ class BuildingData(models.Model):
 				if round(area_already_specified,3) > round(self.total_area,3):
 					raise ValidationError(_("Area allocated to Owners is greater then Total area of Building"))
 
-				self.write({'state': 'staging'})
+				for rec in self.owner_id:
+					if rec.type_id == False:
+						raise ValidationError(_("Please type property type of your owner: %s" %(rec.name.name)))
+					if rec.type_id not in self.type_id:
+						raise ValidationError(_("Type : %s for owner :%s is not valid." %(rec.type_id,rec.name.name)))
+
+				check_double = self.env['owner.building.line'].search([('name','=',self.name)])
+				if check_double:
+					check_double.unlink()
+				for rec in self.owner_id:
+					property_val =  rec.area_own * self.rate_per_meter_square
+					
+					rec.name.building_id.create({
+						"name" : self.id,
+						"property_name" : self.property_name,
+						"area_own" : rec.area_own,
+						"property_value" : property_val,
+						"property_tax" : property_val * 0.15 / 100 if rec.type_id != 'commercial' else property_val * 0.20 / 100 ,
+						"owner_form_id" : rec.name.id
+
+						})
+
+				self.write({'state': 'verified'})
 
 			else:
 				raise ValidationError(_("Please assign owners of Building First"))
 		else:
 			raise ValidationError(_("Please Update information before proceed."))
-
-		self.write({'state': 'verified'})
 
 	@api.multi
 	def cancel(self):
@@ -443,8 +478,13 @@ class BuildingOwnerLine(models.Model):
 	#####################################################
 
 	name = fields.Many2one('res.partner')
-	identification_id = fields.Char("Identification No")
+	identification_id = fields.Char("Identification No", related='name.identification_id')
 	area_own = fields.Float(digits=dp.get_precision('Area Own by Owner'))
+	type_id = fields.Selection([
+        ('commercial', 'Commercial'),
+        ('residential', 'Residential'),
+        ('construction', 'Construction')
+        ], string= "Area Type")
 
 
 	building_data_id = fields.Many2one('building.data',  ondelete='cascade')
