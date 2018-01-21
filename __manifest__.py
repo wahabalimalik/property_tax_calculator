@@ -30,6 +30,7 @@ Calculate:
         'views/menuitems.xml',
         'views/building_data.xml',
         'views/owner.xml',
+        'views/tanent.xml',
         'views/fitting_fixture.xml',
         'views/accommodation.xml',
         'data/building_data.xml',

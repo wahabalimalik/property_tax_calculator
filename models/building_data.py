@@ -52,10 +52,11 @@ class BuildingData(models.Model):
 
 	#####################################################
 	# Below varibles are building relation with bridge between
-	# owners and there building.
+	# owners and tanent and there building.
 	#####################################################
 
 	owner_id = fields.One2many('building.owner.line','building_data_id')
+	tanent_id = fields.One2many('building.tanent.line','building_data_id')
 
 	#####################################################
 	# Below varibles are building information
@@ -485,6 +486,28 @@ class BuildingOwnerLine(models.Model):
         ('residential', 'Residential'),
         ('construction', 'Construction')
         ], string= "Area Type")
+
+
+	building_data_id = fields.Many2one('building.data',  ondelete='cascade')
+
+
+class BuildingTanentLine(models.Model):
+	_name = 'building.tanent.line'
+	
+	#####################################################
+	# Below varibles are Tanent relation with Building.
+	#####################################################
+
+	name = fields.Many2one('res.partner')
+	owner = fields.Many2one('res.partner')
+	identification_id = fields.Char("Identification No", related='name.identification_id')
+	citizen = fields.Boolean()
+	type_id = fields.Selection([
+        ('commercial', 'Commercial'),
+        ('residential', 'Residential'),
+        ('construction', 'Construction')
+        ], string= "Area Type")
+	rent = fields.Float(digits=dp.get_precision('Rent Amount'))
 
 
 	building_data_id = fields.Many2one('building.data',  ondelete='cascade')

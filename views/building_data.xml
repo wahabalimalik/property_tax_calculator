@@ -129,17 +129,6 @@
 
             <notebook>
 
-              <page string="Owners">
-                <field name="owner_id" attrs="{'readonly': [('state', '=', 'verified')]}">
-                  <tree string="Owners" editable="bottom">
-                    <field name="name"/>
-                    <field name="identification_id"/>
-                    <field name="area_own"/>
-                    <field name="type_id"/>
-                  </tree>
-                </field>
-              </page>
-
               <page string="Data Sheet">
                 <group>
                   <button 
@@ -217,6 +206,30 @@
                     <field name="say" attrs="{'readonly': [('state', '=', 'verified')]}"/>
                   </group>
                 </group>
+              </page>
+
+              <page string="Owners">
+                <field name="owner_id" attrs="{'readonly': [('state', '=', 'verified')]}">
+                  <tree string="Owners" editable="bottom">
+                    <field name="name"/>
+                    <field name="identification_id"/>
+                    <field name="area_own"/>
+                    <field name="type_id"/>
+                  </tree>
+                </field>
+              </page>
+
+              <page string="Tanents">
+                <field name="tanent_id" attrs="{'readonly': [('state', '=', 'verified')]}">
+                  <tree string="Tanents" editable="bottom">
+                    <field name="name"/>
+                    <field name="identification_id"/>
+                    <field name="owner"/>
+                    <field name="citizen"/>
+                    <field name="type_id"/>
+                    <field name="rent"/>
+                  </tree>
+                </field>
               </page>
 
             </notebook>

@@ -145,21 +145,7 @@
                         </group>
                     </page>
 
-                    <page string="Tenant Info" >
-	                  	<field name="tenants_ids">
-	                    	<tree 
-	                    		string="Tenant Lines" 
-	                    		editable="bottom">
-	                    		
-		                      	<field name="name"/>
-		                      	<field name="citizen"/>
-		                      	<field name="rent"/>
-		                      	<field name="tax"/>
-	                    	</tree>
-	                  	</field>
-	                </page>
-
-	                <page name='important_detail' string="Important Detail">
+                    <page name='important_detail' string="Important Detail">
 	                	<group>
 	                	<group>
                             
@@ -178,13 +164,28 @@
 
                     <page name='info_data' string="Data">
                         <group>
-                            <group string="Building">
+                            <group 
+                                string="Building"
+                                attrs="{'invisible': [('tenant', '=', True)]}"
+                                >
                                 <field name="total_area_own"/>
                                 <field name="total_property_tax"/>
                             </group>
-                            <group string="Tanent">
+                            <group 
+                                string="Tanent"
+                                attrs="{'invisible': [('tenant', '=', True)]}">
                             </group>
-                            <group string="Bill Board">
+                            <group 
+                                string="Bill Board"
+                                attrs="{'invisible': [('tenant', '=', True)]}"
+                                >
+                            </group>
+                            <group 
+                                string="Total Tax"
+                                attrs="{'invisible': [('owner', '=', True)]}"
+                                >
+                                <field name="total_building"/>
+                                <field name="total_tanent_tax"/>
                             </group>
                             <notebook colspan="4">
                                 <page string="Building Info">
@@ -195,6 +196,20 @@
                                             <field name="area_own"/>
                                             <field name="property_value"/>
                                             <field name="property_tax"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Tenant Info" attrs="{'invisible': [('tenant', '=', True)]}">
+                                    <field name="tenants_ids">
+                                        <tree 
+                                            string="Tenant Lines" 
+                                            editable="bottom">
+                                            
+                                            <field name="name"/>
+                                            <field name="citizen"/>
+                                            <field name="type_id"/>
+                                            <field name="rent"/>
+                                            <field name="tax"/>
                                         </tree>
                                     </field>
                                 </page>
@@ -252,7 +267,7 @@
                 Click to add a owner in your database.
               </p><p>
                 We helps you easily track all activities related to
-                a Owner: Building, Tanents ,Accpunts
+                a Owner: Building, Tanents ,Accounts
                 documents, etc.
               </p>
             </field>

@@ -35,7 +35,7 @@ class ResPartnerOwner(models.Model):
 	citizen = fields.Boolean(default=True)
 
 	#####################################################
-	# Below varible is relation of owner with partner.
+	# Below varible is relation of owner with tanent.
 	#####################################################
 
 	tenants_ids = fields.One2many('owner.tanent.line', 'tnt_ids')
@@ -67,6 +67,9 @@ class ResPartnerOwner(models.Model):
 
 	total_area_own = fields.Float(compute='_compute_area_own')
 	total_property_tax = fields.Float(string='Property Tax',compute='_compute_area_own')
+	
+	total_building = fields.Float()
+	total_tanent_tax = fields.Float(string='Building Tax')
 	
 	#####################################################
 	# This is unique killbill ID of Owner for charging 
@@ -112,10 +115,13 @@ class OwnerTanentLine(models.Model):
 	#####################################################
 
 	name = fields.Many2one('res.partner')
-
 	citizen = fields.Boolean()
 	rent = fields.Integer()
-	# tax = fields.Float(compute='_compute_tax')
+	type_id = fields.Selection([
+        ('commercial', 'Commercial'),
+        ('residential', 'Residential'),
+        ('construction', 'Construction')
+        ], string= "Area Type")
 	tax = fields.Float()
 	
 	tnt_ids = fields.Many2one('res.partner',ondelete='cascade')
