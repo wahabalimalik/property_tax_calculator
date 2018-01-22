@@ -22,7 +22,7 @@ Calculate:
     'category': 'Tax',
     'version': '0.1',
 
-    'depends': ['base','decimal_precision'],
+    'depends': ['account','decimal_precision'],
     'css': ['static/src/css/building_tree.css'],
     
     'data': [
