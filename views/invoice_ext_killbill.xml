@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="data_tranport_killbill_id" model="ir.ui.view">
+        <field name="name">data_tranport killbill_id</field>
+        <field name="model">res.partner</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='function']" position="before">
+                <field name="killbill_id" />
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="data_tranport_killbill_id_invoice" model="ir.ui.view">
+        <field name="name">data_tranport killbill_id_invoice</field>
+        <field name="model">account.invoice</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_invoice']" position="before">
+                <field name="killbill_id" />
+                <field name="kb_invoice_id" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

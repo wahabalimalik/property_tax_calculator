@@ -98,7 +98,7 @@
                     <field 
                     	name="state_id" 
                     	class="o_address_state" 
-                    	options="{&quot;no_open&quot;: True}"
+                    	options='{"no_open": True}'
                       attrs="{'readonly': [('state', '=', 'verified')]}"
                     	placeholder="State"
                     />

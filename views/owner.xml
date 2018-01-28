@@ -9,6 +9,7 @@
 
         <field name="name">property_tax_calculator.res.partner.form</field>
         <field name="model">res.partner</field>
+        <field name="mode">primary</field>
         <field name="arch" type="xml">
             <form string="Partners">
             <sheet>

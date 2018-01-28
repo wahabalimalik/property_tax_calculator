@@ -22,18 +22,20 @@ Calculate:
     'category': 'Tax',
     'version': '0.1',
 
-    'depends': ['account','decimal_precision'],
+    'depends': ['account','decimal_precision','component_event'],
     'css': ['static/src/css/building_tree.css'],
     
     'data': [
         # 'security/ir.model.access.csv',
+        'data/building_data.xml',  
         'views/menuitems.xml',
-        'views/building_data.xml',
         'views/owner.xml',
+        'views/building_data.xml',
         'views/tanent.xml',
         'views/fitting_fixture.xml',
+        'views/standard_cost.xml',
         'views/accommodation.xml',
-        'data/building_data.xml',
+        'views/invoice_ext_killbill.xml',  
     ],
     # 'qweb': [
     #     'static/src/xml/dashboard.xml',

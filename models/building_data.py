@@ -48,7 +48,7 @@ class BuildingData(models.Model):
 
 	property_name = fields.Char()
 	plot_number = fields.Char()
-	standard_cost = fields.Char(required=True)
+	standard_cost = fields.Float(readonly=True)
 
 	#####################################################
 	# Below varibles are building relation with bridge between
@@ -218,7 +218,18 @@ class BuildingData(models.Model):
 			if rec['type'] == 'way':
 				self.type_id = rec['tags']['building'] if 'building' in rec['tags'] else "Nr"
 				self.property_name = rec['tags']['name'] if 'name' in rec['tags'] else "Nr"
-				self.street2 = rec['tags']['addr:street'] if 'addr:street' in rec['tags'] else "Nr"
+				if not self.street2:
+					self.street2 = rec['tags']['addr:street'] if 'addr:street' in rec['tags'] else ""
+				if self.street2:
+					standard_costs = self.env['standard.cost'].search([('name','=',self.street2)])
+
+					if standard_costs and len(standard_costs) ==1:
+						self.standard_cost =  standard_costs.cost
+					else:
+						raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street2))
+				else:
+					raise ValidationError(_("Adress is not available on OSM .Please assign by yourself"))
+
 				self.building_level = rec['tags']['building:levels'] if 'building:levels' in rec['tags'] else "Nr"
 				self.building_material = rec['tags']['building:material'] if 'building:material' in rec['tags'] else "Nr"
 				break
@@ -372,6 +383,27 @@ class BuildingData(models.Model):
 
 	@api.multi
 	def inits(self):
+		#####################################################
+		# double checking if the street is assign or not
+		#####################################################
+		if not self.street2:
+			raise ValidationError(_("Please assign Street first"))
+		# -----------------------------------------------------------
+
+		#####################################################
+		# double checking if the street2 is exist on standard cost
+		# and the cost is in accordance with address
+		#####################################################
+
+		standard_costs = self.env['standard.cost'].search([('name','=',self.street2)])
+
+		if standard_costs and len(standard_costs) ==1:
+			self.standard_cost =  standard_costs.cost
+		else:
+			self.standard_cost = 0
+			raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street2))
+		# -----------------------------------------------------------
+
 		if self.view_data_valuation == True:
 			if self.owner_id:
 				number_of_owner = len(self.owner_id)
@@ -404,6 +436,27 @@ class BuildingData(models.Model):
 
 	@api.multi
 	def verified(self):
+		#####################################################
+		# double checking if the street is assign or not
+		#####################################################
+		if not self.street2:
+			raise ValidationError(_("Please assign Street first"))
+		# -----------------------------------------------------------
+
+		#####################################################
+		# double checking if the street2 is exist on standard cost
+		# and the cost is in accordance with address
+		#####################################################
+
+		standard_costs = self.env['standard.cost'].search([('name','=',self.street2)])
+
+		if standard_costs and len(standard_costs) ==1:
+			self.standard_cost =  standard_costs.cost
+		else:
+			self.standard_cost = 0
+			raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street2))
+		# -----------------------------------------------------------
+		
 		if self.view_data_valuation == True:
 			if self.owner_id:
 				number_of_owner = len(self.owner_id)
@@ -478,7 +531,7 @@ class BuildingOwnerLine(models.Model):
 	# Below varibles are Owner relation with Building.
 	#####################################################
 
-	name = fields.Many2one('res.partner')
+	name = fields.Many2one('res.partner', domain=[('owner', '=', True)])
 	identification_id = fields.Char("Identification No", related='name.identification_id')
 	area_own = fields.Float(digits=dp.get_precision('Area Own by Owner'))
 	type_id = fields.Selection([
@@ -498,7 +551,7 @@ class BuildingTanentLine(models.Model):
 	# Below varibles are Tanent relation with Building.
 	#####################################################
 
-	name = fields.Many2one('res.partner')
+	name = fields.Many2one('res.partner', domain=[('tenant', '=', True)])
 	owner = fields.Many2one('res.partner')
 	identification_id = fields.Char("Identification No", related='name.identification_id')
 	citizen = fields.Boolean()
