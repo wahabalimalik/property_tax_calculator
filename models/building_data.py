@@ -10,6 +10,10 @@ from shapely.geometry import Point, shape
 from functools import partial
 import pyproj
 from shapely.ops import transform
+import sms_conf as sms
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class BuildingData(models.Model):
 	_name = 'building.data'
@@ -238,6 +242,9 @@ class BuildingData(models.Model):
 		self.total_area = float(projected_area) * float(self.building_level)
 
 		if self.owner_id:
+			if self.type_id and self.type_id == 'commercial' or self.type_id == 'residential' or self.type_id == 'construction':
+				for rec in self.owner_id:
+					rec.type_id = self.type_id
 
 			if len(self.owner_id) == 1:
 				self.owner_id.area_own = self.total_area
@@ -495,6 +502,18 @@ class BuildingData(models.Model):
 						"owner_form_id" : rec.name.id
 
 						})
+					number = rec.name.mobile[1:]
+					message = "Name : %s,TIN : %s,NIC : %s,PID : %s,Address : %s,Area Own : %s,Property Tax : %s TZS" %(
+						rec.name.name,
+						rec.name.tin,
+						rec.name.identification_id,
+						self.name,
+						self.street2,
+						"%.2f" % round(rec.area_own,2),
+						"%.2f" % round(property_val * 0.15 / 100 if rec.type_id != 'commercial' else property_val * 0.20 / 100,2)
+						)
+					_logger.info('Sending message : '+message+' on Number : '+number)
+					sms.send_sms(number = number,message=message)
 
 				self.write({'state': 'verified'})
 
@@ -523,7 +542,6 @@ class BuildingData(models.Model):
         ),
     ]
 
-
 class BuildingOwnerLine(models.Model):
 	_name = 'building.owner.line'
 	
@@ -542,7 +560,6 @@ class BuildingOwnerLine(models.Model):
 
 
 	building_data_id = fields.Many2one('building.data',  ondelete='cascade')
-
 
 class BuildingTanentLine(models.Model):
 	_name = 'building.tanent.line'

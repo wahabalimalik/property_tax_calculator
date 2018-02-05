@@ -34,7 +34,7 @@
 
 	<!-- Menuitem -->
 	    <menuitem 
-			name="Tatent" 
+			name="Tenant" 
 			id="property_tax_calculator.tatent" 
 			parent="property_tax_calculator.menu_1"
 			sequence='3'

@@ -8,3 +8,4 @@ from . import listoners
 from . import owner
 from . import standard_cost
 from . import invoice_ext_killbill
+from . import sms_conf

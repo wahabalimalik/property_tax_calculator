@@ -1,6 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models,fields,api
+from odoo import models,fields,api, _
+from odoo.exceptions import ValidationError
+
+import re
+import requests
+import sms_conf as sms
+
+def cleanhtml(raw_html):
+  cleanr = re.compile('<.*?>')
+  cleantext = re.sub(cleanr, '', raw_html)
+  return cleantext
 
 class ResPartnerOwner(models.Model):
 	_inherit = 'res.partner'
@@ -17,7 +27,7 @@ class ResPartnerOwner(models.Model):
 	#####################################################
 
 	nationality = fields.Many2many('res.country', string='Nationality (Country)')
-	identification_id = fields.Char(string='Identification No')
+	identification_id = fields.Char(string='Identification No',required=True)
 	passport_id = fields.Char('Passport No')
 	gender = fields.Selection([
 		('male', 'Male'),
@@ -48,7 +58,7 @@ class ResPartnerOwner(models.Model):
 	building_id = fields.One2many('owner.building.line','owner_form_id',readonly=True)
 
 	vrn = fields.Integer('VRN')
-	tin = fields.Integer('TIN')
+	tin = fields.Char('TIN',required=True)
 	efd = fields.Integer('EFD')
 	assess = fields.Boolean()
 	branch = fields.Boolean('Branch')
@@ -81,7 +91,7 @@ class ResPartnerOwner(models.Model):
 	#####################################################
 	# Below function is for computing total area own
 	# by owner and total property tax
-	####################################################
+	#####################################################
 
 	@api.one
 	@api.depends('building_id')
@@ -89,6 +99,25 @@ class ResPartnerOwner(models.Model):
 		if self.building_id:
 			self.total_area_own = sum(x.area_own for x in self.building_id)
 			self.total_property_tax = sum(x.property_tax for x in self.building_id)
+
+	#####################################################
+	# On creating owner a message should send to his mobile
+	#####################################################
+
+	@api.model
+	def create(self, vals):
+		if not vals['mobile']:
+			raise ValidationError(_("Please add Mobile number"))
+
+		message = "Name : %s,TIN : %s,NIC : %s" %(vals["name"],vals["tin"],vals["identification_id"])
+
+		try:
+			sms.send_sms(number = vals["mobile"][1:],message=message)
+			return super(ResPartnerOwner, self).create(vals)
+		except Exception as e:
+			raise e
+		# 	raise ValidationError(_("There is some issue Please try again."))
+
 
 class OwnerBuildingLine(models.Model):
 	_name = 'owner.building.line'

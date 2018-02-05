@@ -36,9 +36,6 @@ Calculate:
         'views/standard_cost.xml',
         'views/accommodation.xml',
         'views/invoice_ext_killbill.xml',  
-    ],
-    # 'qweb': [
-    #     'static/src/xml/dashboard.xml',
-    #     ],
+    ]
 
 }

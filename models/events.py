@@ -7,7 +7,6 @@ class Base(models.AbstractModel):
 
     @api.model
     def create(self, vals):
-    	print "kkkkkkkkkkkkkkkkkkkkkkkkk"
         record = super(Base, self).create(vals)
         self._event('on_record_create').notify(record, fields=vals.keys())
         return record
