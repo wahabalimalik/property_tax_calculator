@@ -21,8 +21,9 @@ Calculate:
 
     'category': 'Tax',
     'version': '0.1',
+    'application': True,
 
-    'depends': ['account','decimal_precision','component_event'],
+    'depends': ['decimal_precision','textit_sms_service','odoo_killbill_sync'],
     'css': ['static/src/css/building_tree.css'],
     
     'data': [
@@ -35,7 +36,7 @@ Calculate:
         'views/fitting_fixture.xml',
         'views/standard_cost.xml',
         'views/accommodation.xml',
-        'views/invoice_ext_killbill.xml',  
+        'views/tax_config_setting.xml',
     ]
 
 }

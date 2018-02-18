@@ -15,8 +15,9 @@
       	name="Fitting and Fixture" 
       	id="property_tax_calculator.fitting_fixture"
   		  sequence='2'
-      	parent="property_tax_calculator.setting"
+      	parent="property_tax_calculator.configuration"
         action="property_tax_calculator.action_fitting_fixture"
+        groups="base.group_system"
       />
 	
 </odoo>

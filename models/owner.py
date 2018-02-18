@@ -5,7 +5,6 @@ from odoo.exceptions import ValidationError
 
 import re
 import requests
-import sms_conf as sms
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
@@ -82,13 +81,6 @@ class ResPartnerOwner(models.Model):
 	total_tanent_tax = fields.Float(string='Building Tax')
 	
 	#####################################################
-	# This is unique killbill ID of Owner for charging 
-	# tax money from Owner.
-	#####################################################
-
-	killbill_id = fields.Char('KillBill ID')
-
-	#####################################################
 	# Below function is for computing total area own
 	# by owner and total property tax
 	#####################################################
@@ -106,18 +98,21 @@ class ResPartnerOwner(models.Model):
 
 	@api.model
 	def create(self, vals):
+		
 		if not vals['mobile']:
 			raise ValidationError(_("Please add Mobile number"))
 
-		message = "Name : %s,TIN : %s,NIC : %s" %(vals["name"],vals["tin"],vals["identification_id"])
+		if self.user_has_groups('textit_sms_service.group_sms_form'):
 
-		try:
-			sms.send_sms(number = vals["mobile"][1:],message=message)
-			return super(ResPartnerOwner, self).create(vals)
-		except Exception as e:
-			raise e
-		# 	raise ValidationError(_("There is some issue Please try again."))
+			message = "Name : %s,TIN : %s,NIC : %s" %(vals["name"],vals["tin"],vals["identification_id"])
 
+			try:
+				self.env['sms.templates'].send_sms(number = '+255'+vals["mobile"][1:],message=message)
+				return super(ResPartnerOwner, self).create(vals)
+			except Exception as e:
+				raise e
+
+		return super(ResPartnerOwner, self).create(vals)
 
 class OwnerBuildingLine(models.Model):
 	_name = 'owner.building.line'

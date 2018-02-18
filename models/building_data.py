@@ -10,7 +10,6 @@ from shapely.geometry import Point, shape
 from functools import partial
 import pyproj
 from shapely.ops import transform
-import sms_conf as sms
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -502,18 +501,20 @@ class BuildingData(models.Model):
 						"owner_form_id" : rec.name.id
 
 						})
-					number = rec.name.mobile[1:]
-					message = "Name : %s,TIN : %s,NIC : %s,PID : %s,Address : %s,Area Own : %s,Property Tax : %s TZS" %(
-						rec.name.name,
-						rec.name.tin,
-						rec.name.identification_id,
-						self.name,
-						self.street2,
-						"%.2f" % round(rec.area_own,2),
-						"%.2f" % round(property_val * 0.15 / 100 if rec.type_id != 'commercial' else property_val * 0.20 / 100,2)
-						)
-					_logger.info('Sending message : '+message+' on Number : '+number)
-					sms.send_sms(number = number,message=message)
+					if self.user_has_groups('textit_sms_service.group_sms_form'):
+						number = '+225'+rec.name.mobile[1:]
+						message = "Name : %s,TIN : %s,NIC : %s,PID : %s,Address : %s,Area Own : %s,Property Tax : %s TZS" %(
+							rec.name.name,
+							rec.name.tin,
+							rec.name.identification_id,
+							self.name,
+							self.street2,
+							"%.2f" % round(rec.area_own,2),
+							"%.2f" % round(property_val * 0.15 / 100 if rec.type_id != 'commercial' else property_val * 0.20 / 100,2)
+							)
+						_logger.info('Sending message : '+message+' on Number : '+number)
+
+						self.env['sms.templates'].send_sms(number = number,message=message)
 
 				self.write({'state': 'verified'})
 
@@ -593,3 +594,19 @@ class BuildingAccommodationLine(models.Model):
 	quantity = fields.Integer(default=1)
 
 	building_accommodation_line_id = fields.Many2one('building.data')
+
+class Accommodation(models.Model):
+	_name = 'accommodation'
+
+	name = fields.Char()
+
+class FittingFixture(models.Model):
+	_name = 'fitting.fixture'
+
+	name = fields.Char()
+
+class StandardCost(models.Model):
+	_name = 'standard.cost'
+
+	name = fields.Char("Street")
+	cost = fields.Float()

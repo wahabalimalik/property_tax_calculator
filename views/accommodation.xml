@@ -15,8 +15,9 @@
       	name="Accommodtaion" 
       	id="property_tax_calculator.accommodation"
   		  sequence='3'
-      	parent="property_tax_calculator.setting"
+      	parent="property_tax_calculator.configuration"
         action="property_tax_calculator.action_accommodation"
+        groups="base.group_system"
       />
 	
 </odoo>

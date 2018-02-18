@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="property_tax_calculator.view_tax_config_settings" model="ir.ui.view">
+    <field name="name">property_tax_calculator view_tax_config_settings</field>
+    <field name="model">tax.config.settings</field>
+    <field name="arch" type="xml">
+      <form string="Configure Property Tax" class="oe_form_configuration">
+
+        <header>
+          <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+          <button string="Cancel" type="object" name="cancel" class="oe_link" special="cancel"/>
+        </header>
+
+        <group string="Textit SMS Sync" groups="base.group_system">
+          <label for="id" string="SMS"/>
+          <div>
+            <button 
+              type="action" 
+              name="%(base_setup.action_general_configuration)d" 
+              string="Set textit api" 
+              class="btn-link" 
+              icon="fa-cogs"
+            />
+          </div>
+        </group>
+
+        <group string="KillBill Sync" groups="base.group_system">
+          <label for="id" string="KillBill"/>
+          <div>
+            <button 
+              type="action" 
+              name="%(account.action_account_config)d" 
+              string="Set KillBill api" 
+              class="btn-link" 
+              icon="fa-cogs"
+            />
+          </div>
+        </group>
+      </form>
+    </field>
+  </record>
+
+    <!-- Action -->
+      <record id="action_tax_config_settings" model="ir.actions.act_window">
+          <field name="name">Configure Property Tax</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">tax.config.settings</field>
+          <field name="view_mode">form</field>
+          <field name="target">inline</field>
+      </record>
+
+    <!-- Menuitem -->
+      <menuitem 
+      	name="Setting" 
+      	id="property_tax_calculator.setting"
+  		  sequence='0'
+      	parent="property_tax_calculator.configuration"
+        action="property_tax_calculator.action_tax_config_settings"
+        groups="base.group_system"
+      />
+	
+</odoo>

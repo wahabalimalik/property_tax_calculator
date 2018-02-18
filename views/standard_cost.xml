@@ -14,9 +14,10 @@
       <menuitem 
       	name="Standard Cost" 
       	id="property_tax_calculator.standard_cost"
-  		  sequence='3'
-      	parent="property_tax_calculator.setting"
+  		  sequence='4'
+      	parent="property_tax_calculator.configuration"
         action="property_tax_calculator.action_standard_cost"
+        groups="base.group_system"
       />
 	
 </odoo>

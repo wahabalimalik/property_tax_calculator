@@ -19,7 +19,7 @@
   <!-- Setting Menu -->
     <menuitem 
       name="Configuration" 
-      id="property_tax_calculator.setting"
+      id="property_tax_calculator.configuration"
   		sequence='10'
       parent="property_tax_calculator.menu_root"
     />

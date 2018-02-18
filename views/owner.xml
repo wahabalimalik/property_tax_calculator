@@ -174,7 +174,16 @@
                             <field name="efd"/>
                         </group>
                         <group>
-                            <field name="killbill_id"/>
+                            <label 
+                                for="killbill_id" 
+                                groups="odoo_killbill_sync.group_killbill_id_per_partner_form"
+                            />
+                            <div 
+                                name="killbill_id" 
+                                groups="odoo_killbill_sync.group_killbill_id_per_partner_form">
+
+                                <field name="killbill_id"/>
+                            </div>
                             <field name="assess"/>
                             <field name="branch"/>
                             <field name="valued"/>
