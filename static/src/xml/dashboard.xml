@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+    <t t-name="PTC_DashboardsMain">
+        <div class="container-fluid o_ptc_dashboard">
+            
+            <div class="row">
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <div class="text-center o_buildings_draft o_buildings"></div>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <div class="text-center o_buildings_stage o_buildings"></div>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <div class="text-center o_buildings_verify o_buildings"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <div class="o_round_graph"></div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                    <div class="o_bar_graph"></div>
+                </div>
+            </div>
+
+           <!--  <div class="row">
+
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <h2>Total Collection</h2>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_ttl_collection_pt o_buildings"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_ttl_collection_rt o_buildings"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_ttl_collection_bbt o_buildings"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <h2>Expected Collection</h2>
+                     <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_ex_collection_pt o_buildings"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_ex_collection_rt o_buildings"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_ex_collection_bbt o_buildings"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <h2>Payment Status</h2>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_buildings_paid o_buildings"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_buildings_paid o_buildings"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                            <div class="text-center o_buildings_paid o_buildings"></div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="row">
+                <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                    <div class="o_map_view"></div>
+                </div>
+                <!-- <div class="col-lg-3 col-md-12 col-sm-6 col-xs-12">
+                    <div class="o_spline_graph"></div>
+                </div> -->
+            </div>
+
+        </div>
+    </t>
+
+    <!-- <t t-name="PTC_Building_Paid">
+        <div class="text-center o_buildings_paid o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-battery-0 bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="buildings_paid" t-value="widget.data.buildings_paid"/>
+
+                <t t-if="buildings_paid">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Building Paid
+                        </div>
+                        <t t-esc="buildings_paid"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! buildings_paid">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t> -->
+
+    <t t-name="PTC_Building_Draft">
+        <div class="text-center o_buildings_draft o_buildings">
+            <a class="o_browse_draft" role="button">
+            <div class="card-body p-3">
+
+                <i class="fa fa-building-o bg-primary p-3 font-2xl mr-3 float-left o_draft_icon"></i>
+
+                <t t-set="buildings_draft" t-value="widget.data.draft"/>
+                <h3>
+                
+                    <div 
+                        class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                        Draft
+                    </div>
+
+                    <t t-if="buildings_draft">
+                        <t t-esc="buildings_draft"></t>
+                    </t>
+
+                    <t t-if="! buildings_draft">
+                        0
+                    </t>
+                </h3>
+            </div>
+            </a>
+        </div>
+    </t>
+
+    <t t-name="PTC_Building_Stage">
+        <div class="text-center o_buildings_stage o_buildings">
+            <a class="o_browse_stage" role="button">
+
+                <div class="card-body p-3">
+
+                    <i class="fa fa-building-o bg-primary p-3 font-2xl mr-3 float-left o_stage_icon"></i>
+
+                    <t t-set="buildings_stage" t-value="widget.data.staging"/>
+                    <h3>
+                    
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Staging
+                        </div>
+
+                        <t t-if="buildings_stage">
+                            <t t-esc="buildings_stage"></t>
+                        </t>
+
+                        <t t-if="! buildings_stage">
+                            0
+                        </t>
+                    </h3>
+                </div>
+            </a>
+        </div>
+    </t>
+
+    <t t-name="PTC_Building_Verify">
+        
+        <div class="text-center o_buildings_verify o_buildings">
+            <a class="o_browse_verify" role="button">
+
+                <div class="card-body p-3">
+
+                    <i class="fa fa-building-o bg-primary p-3 font-2xl mr-3 float-left o_verify_icon"></i>
+
+                    <t t-set="buildings_verify" t-value="widget.data.verified"/>
+                    <h3>
+                    
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Verified
+                        </div>
+
+                        <t t-if="buildings_verify">
+                            <t t-esc="buildings_verify"></t>
+                        </t>
+
+                        <t t-if="! buildings_verify">
+                            0
+                        </t>
+                    </h3>
+                </div>
+            </a>
+        </div>
+    </t>
+
+    <t t-name="PTC_Round_Graph">
+        <div class="o_round_graph">
+            <div class="card m-b-30">
+                <div class="card-body">
+                    <h4 class="mt-0 header-title">Stages of Building</h4>
+                    <p class="text-muted m-b-30 font-14">Display as Pie Chart.</p>
+                    <div class="pie-charto"></div>
+                </div>
+            </div>
+        </div>
+        <!--C3 Chart-->
+
+        <t t-set="buildings_draft" t-value="widget.data.draft"/>
+        <t t-set="buildings_stage" t-value="widget.data.staging"/>
+        <t t-set="buildings_verify" t-value="widget.data.verified"/>
+
+                
+        <script >
+            var chart = c3.generate({
+                bindto:".pie-charto",
+                data: {
+                    // iris data from R
+                    columns: [
+                        ['Draft', <t t-esc="buildings_draft"></t>],
+                        ['Staging', <t t-esc="buildings_stage"></t>],
+                        ['Verified', <t t-esc="buildings_verify"></t>],
+                    ],
+                    type : 'pie',
+                    onclick: function (d, i) { console.log("onclick", d, i); },
+                    onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+                    onmouseout: function (d, i) { console.log("onmouseout", d, i); }
+                }
+            });
+        </script>
+    </t>
+
+    <t t-name="PTC_Bar_Graph">
+        <div class="o_bar_graph">
+            <div class="card m-b-30">
+                <div class="card-body">
+                    <h4 class="mt-0 header-title">Recivings</h4>
+                    <p class="text-muted m-b-30 font-14">Display as Bars Chart.</p>
+                    <div class="bar-chart"></div>
+                </div>
+            </div>
+        </div>
+        <!--C3 Chart-->
+
+        <t t-set="p_jan" t-value="widget.data.property_tax.p_jan"/>
+        <t t-set="p_feb" t-value="widget.data.property_tax.p_feb"/>
+        <t t-set="p_mar" t-value="widget.data.property_tax.p_mar"/>
+        <t t-set="p_apl" t-value="widget.data.property_tax.p_apl"/>
+        <t t-set="p_may" t-value="widget.data.property_tax.p_may"/>
+        <t t-set="p_jun" t-value="widget.data.property_tax.p_jun"/>
+        <t t-set="p_jul" t-value="widget.data.property_tax.p_jul"/>
+        <t t-set="p_aug" t-value="widget.data.property_tax.p_aug"/>
+        <t t-set="p_sep" t-value="widget.data.property_tax.p_sep"/>
+        <t t-set="p_oct" t-value="widget.data.property_tax.p_oct"/>
+        <t t-set="p_nov" t-value="widget.data.property_tax.p_nov"/>
+        <t t-set="p_dec" t-value="widget.data.property_tax.p_dec"/>
+
+        <t t-set="r_jan" t-value="widget.data.rental_tax.r_jan"/>
+        <t t-set="r_feb" t-value="widget.data.rental_tax.r_feb"/>
+        <t t-set="r_mar" t-value="widget.data.rental_tax.r_mar"/>
+        <t t-set="r_apl" t-value="widget.data.rental_tax.r_apl"/>
+        <t t-set="r_may" t-value="widget.data.rental_tax.r_may"/>
+        <t t-set="r_jun" t-value="widget.data.rental_tax.r_jun"/>
+        <t t-set="r_jul" t-value="widget.data.rental_tax.r_jul"/>
+        <t t-set="r_aug" t-value="widget.data.rental_tax.r_aug"/>
+        <t t-set="r_sep" t-value="widget.data.rental_tax.r_sep"/>
+        <t t-set="r_oct" t-value="widget.data.rental_tax.r_oct"/>
+        <t t-set="r_nov" t-value="widget.data.rental_tax.r_nov"/>
+        <t t-set="r_dec" t-value="widget.data.rental_tax.r_dec"/>
+
+        <script >
+            var chart = c3.generate({
+                bindto: '.bar-chart',
+                data: {
+                    x: 'x',
+                    columns: [
+                        [
+                            'x', 
+                            '2018-01-02','2018-02-02','2018-03-02',
+                            '2018-04-02','2018-05-02','2018-06-02',
+                            '2018-07-02','2018-08-02','2018-09-02',
+                            '2018-10-02','2018-11-02','2018-12-02',
+                        ],
+
+                        [
+                            'Rental Tax', 
+                            <t t-esc="r_jan"/>,<t t-esc="r_feb"/>,
+                            <t t-esc="r_mar"/>,<t t-esc="r_apl"/>,
+                            <t t-esc="r_may"/>,<t t-esc="r_jun"/>,
+                            <t t-esc="r_jul"/>,<t t-esc="r_aug"/>,
+                            <t t-esc="r_sep"/>,<t t-esc="r_oct"/>,
+                            <t t-esc="r_nov"/>,<t t-esc="r_dec"/>
+                        ],
+
+                        [
+                            'Property Tax', 
+                            <t t-esc="p_jan"/>,<t t-esc="p_feb"/>,<t t-esc="p_mar"/>,
+                            <t t-esc="p_apl"/>,<t t-esc="p_may"/>,<t t-esc="p_jun"/>,
+                            <t t-esc="p_jul"/>,<t t-esc="p_aug"/>,<t t-esc="p_sep"/>,
+                            <t t-esc="p_oct"/>,<t t-esc="p_nov"/>,<t t-esc="p_dec"/>
+                        ]
+                    ],
+
+                    type: 'bar'
+                },
+
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        localtime: false,
+                        tick: {
+                            format: '%b'
+                        }
+                    }
+                }
+            });
+        </script>
+    </t>
+
+    <t t-name="PTC_Spline_Graph">
+        <div class="o_spline_graph">
+            <div class="card m-b-30">
+                <div class="card-body">
+                    <h4 class="mt-0 header-title">Bar Chart</h4>
+                    <p class="text-muted m-b-30 font-14">Display as Bars Chart.</p>
+                    <div class="spline-chart"></div>
+                </div>
+            </div>
+        </div>
+        <!--C3 Chart-->
+
+        <t t-set="buildings_draft" t-value="widget.data.draft"/>
+        <t t-set="buildings_stage" t-value="widget.data.staging"/>
+        <t t-set="buildings_verify" t-value="widget.data.verified"/>
+
+        <script >
+            var chart = c3.generate({
+                bindto: '.spline-chart',
+                data: {
+                    columns: [
+                        ['data1', 30, 200, 100, 400, 150, 250],
+                        ['data2', 130, 100, 140, 200, 150, 50]
+                    ],
+                    type: 'spline'
+                }
+            });
+        </script>
+    </t>
+
+    <t t-name="PTC_Map_View">
+        <t t-call="MapView"/>
+    </t>
+
+    <!-- <t t-name="PTC_Total_Collection_PT">
+        <div class="text-center o_ttl_collection_pt o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-bar-chart bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="property_tax" t-value="widget.data.property_tax"/>
+
+                <t t-if="property_tax">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Property Tax
+                        </div>
+                        <t t-esc="property_tax"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! property_tax">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="PTC_Total_Collection_RT">
+        <div class="text-center o_ttl_collection_rt o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-bar-chart bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="rental_tax" t-value="widget.data.rental_tax"/>
+
+                <t t-if="rental_tax">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Rental Tax
+                        </div>
+                        <t t-esc="rental_tax"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! rental_tax">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="PTC_Total_Collection_BBT">
+        <div class="text-center o_ttl_collection_bbt o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-bar-chart bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="billboard_tax" t-value="widget.data.billboard_tax"/>
+
+                <t t-if="billboard_tax">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Billboard Tax
+                        </div>
+                        <t t-esc="billboard_tax"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! billboard_tax">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="PTC_EX_Collection_PT">
+        <div class="text-center o_ex_collection_pt o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-line-chart bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="property_tax" t-value="widget.data.property_tax"/>
+
+                <t t-if="property_tax">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Property Tax
+                        </div>
+                        <t t-esc="property_tax"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! property_tax">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="PTC_EX_Collection_RT">
+        <div class="text-center o_ex_collection_rt o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-line-chart bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="rental_tax" t-value="widget.data.rental_tax"/>
+
+                <t t-if="rental_tax">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Rental Tax
+                        </div>
+                        <t t-esc="rental_tax"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! rental_tax">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="PTC_EX_Collection_BBT">
+        <div class="text-center o_ex_collection_bbt o_buildings">
+            <div class="card-body p-3">
+
+                <i class="fa fa-line-chart bg-primary p-3 font-2xl mr-3 float-left"></i>
+
+                <t t-set="billboard_tax" t-value="widget.data.billboard_tax"/>
+
+                <t t-if="billboard_tax">
+                    <h3>
+                        <div 
+                            class="text-uppercase text-muted font-weight-bold font-xs mb-0 mt-2">
+                            Billboard Tax
+                        </div>
+                        <t t-esc="billboard_tax"></t>
+                    </h3>
+                </t>
+
+                <t t-if="! billboard_tax">
+                    No tax is paid yet
+                </t>
+            </div>
+        </div>
+    </t> -->
+
+</templates>

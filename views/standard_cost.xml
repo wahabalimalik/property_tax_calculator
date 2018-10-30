@@ -10,6 +10,16 @@
           <field name="view_mode">tree,form</field>
       </record>
 
+    <!-- Action for directly go to from view -->
+
+      <record model="ir.actions.act_window" 
+          id="property_tax_calculator.action_standard_cost_form">
+
+          <field name="name">Standard Cost Form</field>
+          <field name="res_model">standard.cost</field>
+          <field name="view_mode">form</field>
+      </record>
+
     <!-- Menuitem -->
       <menuitem 
       	name="Standard Cost" 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<!-- Template -->
+      	<template 
+	      	id="assets_backend" 
+	      	name="ptc_dashboard" 
+	      	inherit_id="web.assets_backend">
+
+          	<xpath expr="." position="inside">
+          		<link 
+          			href="/property_tax_calculator/static/src/css/ptc_dashboard.css" 
+          			rel="stylesheet" 
+          			type="text/css"
+          		/>
+          		
+                <script 
+                	type="text/javascript" 
+                	src="/property_tax_calculator/static/src/js/dashboard.js"
+                />
+
+                <link 
+          			href="/property_tax_calculator/static/lib/plugins/c3/c3.min.css" 
+          			rel="stylesheet" 
+          			type="text/css"
+          		/>
+
+          		<script 
+                    type="text/javascript" 
+                    src="/property_tax_calculator/static/lib/plugins/d3/d3.min.js"></script>
+                <script 
+                    type="text/javascript" 
+                    src="/property_tax_calculator/static/lib/plugins/c3/c3.min.js"></script>
+          	</xpath>
+     	 </template>
+	<!-- Action -->
+		<record 
+			model="ir.actions.client" 
+			id="property_tax_calculator.action_dashboard">
+
+	      	<field name="name">Dashboard</field>
+	      	<field name="tag">property_tax_calculator.dashboard</field>
+	    </record>
+
+	<!-- Menuitem -->
+
+	 	<menuitem 
+	      name="Dashboard" 
+	      id="property_tax_calculator.dashboard" 
+	      parent="property_tax_calculator.menu_root"
+	      sequence = "-1"
+	      action="property_tax_calculator.action_dashboard"
+	    />
+</odoo>

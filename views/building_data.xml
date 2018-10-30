@@ -10,6 +10,12 @@
 
           <header>
             <button 
+              name="create_build_data"  
+              class="btn-primary" 
+              string="Update Information" 
+              type="object"
+            />
+            <button 
               name="inits" 
               class="oe_highlight" 
               states="draft" 
@@ -66,6 +72,12 @@
                   <label for="street" string="Address"/>
                   <div class="o_address_format">
                     <field 
+                      name="street_sc" 
+                      placeholder="Street..." 
+                      class="o_address_street" 
+                      attrs="{'readonly': [('state', '=', 'verified')]}"
+                    />
+                    <!-- <field 
                     	name="street" 
                     	placeholder="Street..." 
                     	class="o_address_street" 
@@ -76,7 +88,7 @@
                       placeholder="Street 2..." 
                       class="o_address_street" 
                       attrs="{'readonly': [('state', '=', 'verified')]}"
-                    />
+                    /> -->
                     <field 
                       name="ward" 
                       placeholder="Ward..." 
@@ -95,7 +107,7 @@
                     	class="o_address_city" 
                       attrs="{'readonly': [('state', '=', 'verified')]}"
                     />
-                    <field 
+                   <!--  <field 
                     	name="state_id" 
                     	class="o_address_state" 
                     	options='{"no_open": True}'
@@ -107,7 +119,7 @@
                     	placeholder="P Code" 
                     	class="o_address_zip" 
                       attrs="{'readonly': [('state', '=', 'verified')]}"
-                    />
+                    /> -->
                     <field 
                     	name="country_id" 
                     	placeholder="Country" 
@@ -130,16 +142,16 @@
             <notebook>
 
               <page string="Data Sheet">
-                <group>
+                <!-- <group>
                   <button 
                     name="create_build_data"  
                     class="btn-primary" 
                     string="Update Information" 
                     type="object"
                     />
-                </group>
+                </group> -->
 
-                <group>
+                <group string='Scaling'>
                   <group>
                     <field name="tenure" attrs="{'readonly': [('state', '=', 'verified')]}"/>
                     <field name="state_of_build" attrs="{'readonly': [('state', '=', 'verified')]}"/>
@@ -210,8 +222,40 @@
 
               <page string="Owners">
                 <field name="owner_id" attrs="{'readonly': [('state', '=', 'verified')]}">
+                  <form string="Owners">
+                    <group>
+                      <group>
+                        <field 
+                          name="name" 
+                          context="{
+                          'form_view_ref': 'property_tax_calculator.view_partner_form',
+                          'default_owner':1
+                          }"
+                        />
+                          <!-- options='{
+                            "no_open": True,
+                            "no_create": True
+                          }' -->
+                        <field name="identification_id"/>
+                      </group>
+                      <group>
+                        <field name="area_own"/>
+                        <field name="type_id"/>
+                      </group>
+                    </group>
+                  </form>
                   <tree string="Owners" editable="bottom">
-                    <field name="name"/>
+                    <field 
+                      name="name" 
+                      context="{
+                      'form_view_ref': 'property_tax_calculator.view_partner_form',
+                      'default_owner':1
+                      }"
+                    />
+                      <!-- options='{
+                        "no_open": True,
+                        "no_create": True
+                      }' -->
                     <field name="identification_id"/>
                     <field name="area_own"/>
                     <field name="type_id"/>
@@ -219,12 +263,50 @@
                 </field>
               </page>
 
-              <page string="Tanents">
-                <field name="tanent_id" attrs="{'readonly': [('state', '=', 'verified')]}">
-                  <tree string="Tanents" editable="bottom">
-                    <field name="name"/>
+              <page string="Tenants">
+                <field name="tenant_id" attrs="{'readonly': [('state', '=', 'verified')]}">
+                  <form string="Tenant">
+                    <group>
+                      <group>
+                        <field 
+                          name="name"
+                          context="{
+                          'form_view_ref': 'property_tax_calculator.view_partner_form',
+                          'default_tenant':1
+                          }"
+                        />
+                        <field name="identification_id"/>
+                        <field 
+                          name="owner"
+                          context="{
+                          'form_view_ref': 'property_tax_calculator.view_partner_form',
+                          'default_tenant':1
+                          }"
+                          />
+                      </group>
+                      <group>
+                        <field name="citizen"/>
+                        <field name="type_id"/>
+                        <field name="rent"/>
+                      </group>
+                    </group>
+                  </form>
+                  <tree string="tenants" editable="bottom">
+                    <field 
+                      name="name"
+                      context="{
+                      'form_view_ref': 'property_tax_calculator.view_partner_form',
+                      'default_tenant':1
+                      }"
+                    />
                     <field name="identification_id"/>
-                    <field name="owner"/>
+                    <field 
+                      name="owner"
+                      context="{
+                        'form_view_ref': 'property_tax_calculator.view_partner_form',
+                        'default_tenant':1
+                        }"
+                      />
                     <field name="citizen"/>
                     <field name="type_id"/>
                     <field name="rent"/>
@@ -286,6 +368,18 @@
       </field>
     </record>
 
+  <!-- Map View -->
+
+    <record id="view_building_map" model="ir.ui.view">
+        <field name="name">view.building.map</field>
+        <field name="model">building.data</field>
+        <field name="arch" type="xml">
+            <map>
+                <field name="name"/>
+            </map>
+        </field>
+    </record>
+
   <!-- Action -->
     <record
       model="ir.actions.act_window" 
@@ -303,11 +397,56 @@
         	that building.
         </p>
       </field>
-      <field name="view_mode">tree,form</field>
+      <field name="view_mode">tree,form,map</field>
       <field 
         name="search_view_id" 
         ref="property_tax_calculator.build_data_search" 
       />
+    </record>
+
+    <record
+      model="ir.actions.act_window" 
+      id="property_tax_calculator.action_building_draft_context">
+
+      <field name="name">Building Draft</field>
+      <field name="res_model">building.data</field>
+      <field name="domain">[('state','=', 'draft')]</field>
+      
+      <field name="view_mode">tree,form,map</field>
+      <!-- <field 
+        name="search_view_id" 
+        ref="property_tax_calculator.build_data_search" 
+      /> -->
+    </record>
+
+    <record
+      model="ir.actions.act_window" 
+      id="property_tax_calculator.action_building_staging_context">
+
+      <field name="name">Building Staging</field>
+      <field name="res_model">building.data</field>
+      <field name="domain">[('state','=', 'staging')]</field>
+      
+      <field name="view_mode">tree,form,map</field>
+      <!-- <field 
+        name="search_view_id" 
+        ref="property_tax_calculator.build_data_search" 
+      /> -->
+    </record>
+
+    <record
+      model="ir.actions.act_window" 
+      id="property_tax_calculator.action_building_verify_context">
+
+      <field name="name">Building Verify</field>
+      <field name="res_model">building.data</field>
+      <field name="domain">[('state','=', 'verified')]</field>
+      
+      <field name="view_mode">tree,form,map</field>
+      <!-- <field 
+        name="search_view_id" 
+        ref="property_tax_calculator.build_data_search" 
+      /> -->
     </record>
 
   <!-- Menuitem -->

@@ -201,7 +201,7 @@
                                 <field name="total_property_tax"/>
                             </group>
                             <group 
-                                string="Tanent"
+                                string="tenant"
                                 attrs="{'invisible': [('tenant', '=', True)]}">
                             </group>
                             <group 
@@ -214,10 +214,13 @@
                                 attrs="{'invisible': [('owner', '=', True)]}"
                                 >
                                 <field name="total_building"/>
-                                <field name="total_tanent_tax"/>
+                                <field name="total_tenant_tax"/>
                             </group>
                             <notebook colspan="4">
-                                <page string="Building Info">
+                                <page 
+                                    string="Building Info"
+                                    attrs="{'invisible': [('tenant', '=', True)]}"
+                                    >
                                     <field name="building_id" options='{"no_open": True, "no_create": True}'>
                                         <tree>
                                             <field name="name"/>
@@ -239,6 +242,19 @@
                                             <field name="type_id"/>
                                             <field name="rent"/>
                                             <field name="tax"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page 
+                                    string="Rental Info"
+                                    attrs="{'invisible': [('owner', '=', True)]}"
+                                    >
+                                    <field name="building_rent_id" options='{"no_open": True, "no_create": True}'>
+                                        <tree>
+                                            <field name="name"/>
+                                            <field name="property_name"/>
+                                            <field name="area"/>
+                                            <field name="rental_tax"/>
                                         </tree>
                                     </field>
                                 </page>
@@ -296,7 +312,7 @@
                 Click to add a owner in your database.
               </p><p>
                 We helps you easily track all activities related to
-                a Owner: Building, Tanents ,Accounts
+                a Owner: Building, tenants ,Accounts
                 documents, etc.
               </p>
             </field>

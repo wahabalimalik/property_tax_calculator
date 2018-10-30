@@ -5,7 +5,8 @@
 		<menuitem 
 			name="Tax Calculator" 
 			id="property_tax_calculator.menu_root"
-      sequence='1'
+      web_icon="property_tax_calculator,static/description/icon.png"
+      sequence='-1'
 		/>
 
 	<!-- Second Menu -->

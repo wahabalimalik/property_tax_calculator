@@ -3,14 +3,6 @@
 from odoo import models,fields,api, _
 from odoo.exceptions import ValidationError
 
-import re
-import requests
-
-def cleanhtml(raw_html):
-  cleanr = re.compile('<.*?>')
-  cleantext = re.sub(cleanr, '', raw_html)
-  return cleantext
-
 class ResPartnerOwner(models.Model):
 	_inherit = 'res.partner'
 
@@ -44,10 +36,10 @@ class ResPartnerOwner(models.Model):
 	citizen = fields.Boolean(default=True)
 
 	#####################################################
-	# Below varible is relation of owner with tanent.
+	# Below varible is relation of owner with tenant.
 	#####################################################
 
-	tenants_ids = fields.One2many('owner.tanent.line', 'tnt_ids')
+	tenants_ids = fields.One2many('owner.tenant.line', 'tnt_ids')
 
 	#####################################################
 	# Below varibles are owner information
@@ -55,6 +47,7 @@ class ResPartnerOwner(models.Model):
 	#####################################################
 
 	building_id = fields.One2many('owner.building.line','owner_form_id',readonly=True)
+	building_rent_id = fields.One2many('tenant.building.line','tenant_form_id',readonly=True)
 
 	vrn = fields.Integer('VRN')
 	tin = fields.Char('TIN',required=True)
@@ -78,7 +71,7 @@ class ResPartnerOwner(models.Model):
 	total_property_tax = fields.Float(string='Property Tax',compute='_compute_area_own')
 	
 	total_building = fields.Float()
-	total_tanent_tax = fields.Float(string='Building Tax')
+	total_tenant_tax = fields.Float(string='Building Tax')
 	
 	#####################################################
 	# Below function is for computing total area own
@@ -129,13 +122,14 @@ class OwnerBuildingLine(models.Model):
 	##########################################
 
 	owner_form_id = fields.Many2one('res.partner')
+	# invoice_form_id = fields.Many2one('account.invoice')
 
-class OwnerTanentLine(models.Model):
-	_name = 'owner.tanent.line'
-	_description = "This class is bridge between Owners and Tanents"
+class OwnertenantLine(models.Model):
+	_name = 'owner.tenant.line'
+	_description = "This class is bridge between Owners and tenants"
 	
 	#####################################################
-	# Below varibles are Owner relation with Tanents.
+	# Below varibles are Owner relation with tenants.
 	#####################################################
 
 	name = fields.Many2one('res.partner')
@@ -149,3 +143,18 @@ class OwnerTanentLine(models.Model):
 	tax = fields.Float()
 	
 	tnt_ids = fields.Many2one('res.partner',ondelete='cascade')
+
+class TenantBuildingLine(models.Model):
+	_name = 'tenant.building.line'
+	_description = "This class is bridge between Tenant and Building"
+
+	name = fields.Many2one('building.data')
+	property_name = fields.Char()
+	area = fields.Float()
+	rental_tax = fields.Float()
+
+	##########################################
+	# Connection inverse fields
+	##########################################
+
+	tenant_form_id = fields.Many2one('res.partner')

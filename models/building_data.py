@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models,fields,api, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError,RedirectWarning
 from odoo.addons import decimal_precision as dp
 
 import requests,json
@@ -35,6 +35,8 @@ class BuildingData(models.Model):
 	# Below varibles are address related fields
 	##################################################### 
 
+	street_sc = fields.Many2one('standard.cost', string='Street')
+
 	street = fields.Char()
 	street2 = fields.Char()
 	ward = fields.Char()
@@ -51,15 +53,15 @@ class BuildingData(models.Model):
 
 	property_name = fields.Char()
 	plot_number = fields.Char()
-	standard_cost = fields.Float(readonly=True)
+	standard_cost = fields.Float(readonly=True, related='street_sc.cost')
 
 	#####################################################
 	# Below varibles are building relation with bridge between
-	# owners and tanent and there building.
+	# owners and tenant and there building.
 	#####################################################
 
 	owner_id = fields.One2many('building.owner.line','building_data_id')
-	tanent_id = fields.One2many('building.tanent.line','building_data_id')
+	tenant_id = fields.One2many('building.tenant.line','building_data_id')
 
 	#####################################################
 	# Below varibles are building information
@@ -181,6 +183,14 @@ class BuildingData(models.Model):
 	def create_build_data(self):
 
 		##########################################
+		# Check form info is complete.
+		# All important fields are required
+		# except owner
+		##########################################
+		if not self.owner_id:
+			raise ValidationError(_("You must select an owner first!"))
+
+		##########################################
 		# Creating polygon
 		##########################################
 
@@ -217,64 +227,80 @@ class BuildingData(models.Model):
 		s_new = transform(proj, s)
 		projected_area = transform(proj, s).area
 
+		street_sc_check = False
 		for rec in data['elements']:
 			if rec['type'] == 'way':
 				self.type_id = rec['tags']['building'] if 'building' in rec['tags'] else "Nr"
 				self.property_name = rec['tags']['name'] if 'name' in rec['tags'] else "Nr"
-				if not self.street2:
-					self.street2 = rec['tags']['addr:street'] if 'addr:street' in rec['tags'] else ""
-				if self.street2:
-					standard_costs = self.env['standard.cost'].search([('name','=',self.street2)])
 
-					if standard_costs and len(standard_costs) ==1:
-						self.standard_cost =  standard_costs.cost
+
+				if not self.street_sc:
+					osm_street_name = rec['tags']['addr:street'] if 'addr:street' in rec['tags'] else ""
+					
+					if_standard_costs = self.env['standard.cost'].search([('name','=',osm_street_name)])
+
+					if if_standard_costs:
+						self.street_sc = if_standard_costs
+
 					else:
-						raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street2))
-				else:
-					raise ValidationError(_("Adress is not available on OSM .Please assign by yourself"))
+						create_rec = self.env['standard.cost'].create({'name':osm_street_name})
 
-				self.building_level = rec['tags']['building:levels'] if 'building:levels' in rec['tags'] else "Nr"
+						retrive_rec = self.env['standard.cost'].search([('name','=',osm_street_name)])
+
+						self.street_sc = retrive_rec.id
+
+						street_sc_check = True
+
+				self.building_level = rec['tags']['building:levels'] if 'building:levels' in rec['tags'] else "1"
 				self.building_material = rec['tags']['building:material'] if 'building:material' in rec['tags'] else "Nr"
 				break
 
 		self.surface_area = projected_area
+
 		self.total_area = float(projected_area) * float(self.building_level)
 
-		if self.owner_id:
-			if self.type_id and self.type_id == 'commercial' or self.type_id == 'residential' or self.type_id == 'construction':
-				for rec in self.owner_id:
-					rec.type_id = self.type_id
+		if self.type_id and self.type_id == 'commercial' or self.type_id == 'residential' or self.type_id == 'construction':
+			for rec in self.owner_id:
+				rec.type_id = self.type_id
 
-			if len(self.owner_id) == 1:
-				self.owner_id.area_own = self.total_area
-
-			else:
-				number_of_owner = len(self.owner_id)
-				area_already_specified = sum(x.area_own for x in self.owner_id)
-				remaining_area = self.total_area - area_already_specified
-				no_f_ownr_alrdy_spcfid_area = 0
-				for x in self.owner_id:
-					if x.area_own !=0:
-						no_f_ownr_alrdy_spcfid_area = no_f_ownr_alrdy_spcfid_area + 1
-
-				if number_of_owner == no_f_ownr_alrdy_spcfid_area and remaining_area > 0:
-					raise ValidationError(_("Almost %s square foot area is unspecified.Please allocate it") 
-						%(remaining_area))
-
-				if round(area_already_specified,3) > round(self.total_area,3):
-					raise ValidationError(_("Area allocated to Owners is greater then Total area of Building"))
-
-				for rec in self.owner_id:
-					if rec.area_own == 0:
-						rec.area_own = remaining_area / (number_of_owner - no_f_ownr_alrdy_spcfid_area)
-
-					if self.type_id == "commercial" or self.type_id == "residential" or self.type_id == "construction":
-						rec.type_id = self.type_id
+		if len(self.owner_id) == 1:
+			self.owner_id.area_own = self.total_area
 
 		else:
-			raise ValidationError(_("Please assign owners of Building First"))
+			number_of_owner = len(self.owner_id)
+			area_already_specified = sum(x.area_own for x in self.owner_id)
+			remaining_area = self.total_area - area_already_specified
+			no_f_ownr_alrdy_spcfid_area = 0
+			for x in self.owner_id:
+				if x.area_own !=0:
+					no_f_ownr_alrdy_spcfid_area = no_f_ownr_alrdy_spcfid_area + 1
+
+			if number_of_owner == no_f_ownr_alrdy_spcfid_area and remaining_area > 0:
+				raise ValidationError(_("Almost %s square foot area is unspecified.Please allocate it") 
+					%(remaining_area))
+
+			if round(area_already_specified,3) > round(self.total_area,3):
+				raise ValidationError(_("Area allocated to Owners is greater then Total area of Building"))
+
+			for rec in self.owner_id:
+				if rec.area_own == 0:
+					rec.area_own = remaining_area / (number_of_owner - no_f_ownr_alrdy_spcfid_area)
+
+				if self.type_id == "commercial" or self.type_id == "residential" or self.type_id == "construction":
+					rec.type_id = self.type_id
 
 		self.view_data_valuation = '1'
+		if street_sc_check:
+			return {
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form,tree',
+                'res_model': 'standard.cost',
+                'target': 'current',
+                'context': self._context,
+                'res_id': retrive_rec.id,
+                'flags': {'initial_mode': 'edit'},
+            } 
 
 	@api.one
 	@api.depends('walls','roof','ceiling','floor','windows','doors','services','standard_cost')
@@ -390,24 +416,31 @@ class BuildingData(models.Model):
 	@api.multi
 	def inits(self):
 		#####################################################
+		# Checking if the Update Information is clicks
+		#####################################################
+		if not self.view_data_valuation:
+			raise ValidationError(_("Please click Update Information first"))
+		# -----------------------------------------------------------
+		
+		#####################################################
 		# double checking if the street is assign or not
 		#####################################################
-		if not self.street2:
+		if not self.street_sc:
 			raise ValidationError(_("Please assign Street first"))
 		# -----------------------------------------------------------
 
 		#####################################################
-		# double checking if the street2 is exist on standard cost
+		# double checking if the street_sc is exist on standard cost
 		# and the cost is in accordance with address
 		#####################################################
 
-		standard_costs = self.env['standard.cost'].search([('name','=',self.street2)])
+		standard_costs = self.env['standard.cost'].search([('name','=',self.street_sc.name)])
 
 		if standard_costs and len(standard_costs) ==1:
 			self.standard_cost =  standard_costs.cost
 		else:
 			self.standard_cost = 0
-			raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street2))
+			raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street_sc.name))
 		# -----------------------------------------------------------
 
 		if self.view_data_valuation == True:
@@ -430,13 +463,15 @@ class BuildingData(models.Model):
 				for rec in self.owner_id:
 					if rec.type_id == False:
 						raise ValidationError(_("Please type property type of your owner: %s" %(rec.name.name)))
-					if rec.type_id not in self.type_id:
-						raise ValidationError(_("Type : %s for owner :%s is not valid." %(rec.type_id,rec.name.name)))
-
-				self.write({'state': 'staging'})
-
+					
+					if self.type_id in ['commercial','residential','construction']:
+						if rec.type_id not in self.type_id:
+							raise ValidationError(_("Type : %s for owner :%s is not valid." %(rec.type_id,rec.name.name)))
+				
 			else:
 				raise ValidationError(_("Please assign owners of Building First"))
+
+			self.write({'state': 'staging'})
 		else:
 			raise ValidationError(_("Please Update information before proceed."))
 
@@ -445,22 +480,29 @@ class BuildingData(models.Model):
 		#####################################################
 		# double checking if the street is assign or not
 		#####################################################
-		if not self.street2:
+		if not self.street_sc:
 			raise ValidationError(_("Please assign Street first"))
 		# -----------------------------------------------------------
 
 		#####################################################
-		# double checking if the street2 is exist on standard cost
+		# double checking if the Site works is assign or not
+		#####################################################
+		if self.site_works == 0.00:
+			raise ValidationError(_("Please assign Site works first"))
+		# -----------------------------------------------------------
+
+		#####################################################
+		# double checking if the street_sc is exist on standard cost
 		# and the cost is in accordance with address
 		#####################################################
 
-		standard_costs = self.env['standard.cost'].search([('name','=',self.street2)])
+		standard_costs = self.env['standard.cost'].search([('name','=',self.street_sc.name)])
 
 		if standard_costs and len(standard_costs) ==1:
 			self.standard_cost =  standard_costs.cost
 		else:
 			self.standard_cost = 0
-			raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street2))
+			raise ValidationError(_("This address : %s is not assign at standard cost or assign multiple times.Please fix it first.") %(self.street_sc.name))
 		# -----------------------------------------------------------
 		
 		if self.view_data_valuation == True:
@@ -483,8 +525,10 @@ class BuildingData(models.Model):
 				for rec in self.owner_id:
 					if rec.type_id == False:
 						raise ValidationError(_("Please type property type of your owner: %s" %(rec.name.name)))
-					if rec.type_id not in self.type_id:
-						raise ValidationError(_("Type : %s for owner :%s is not valid." %(rec.type_id,rec.name.name)))
+					
+					if self.type_id in ['commercial','residential','construction']:
+						if rec.type_id not in self.type_id:
+							raise ValidationError(_("Type : %s for owner :%s is not valid." %(rec.type_id,rec.name.name)))
 
 				check_double = self.env['owner.building.line'].search([('name','=',self.name)])
 				if check_double:
@@ -508,7 +552,7 @@ class BuildingData(models.Model):
 							rec.name.tin,
 							rec.name.identification_id,
 							self.name,
-							self.street2,
+							self.street_sc.name,
 							"%.2f" % round(rec.area_own,2),
 							"%.2f" % round(property_val * 0.15 / 100 if rec.type_id != 'commercial' else property_val * 0.20 / 100,2)
 							)
@@ -516,10 +560,48 @@ class BuildingData(models.Model):
 
 						self.env['sms.templates'].send_sms(number = number,message=message)
 
-				self.write({'state': 'verified'})
-
 			else:
 				raise ValidationError(_("Please assign owners of Building First"))
+
+			# -----------------------------------------------------------
+
+			if self.tenant_id:
+
+
+				check_double = self.env['tenant.building.line'].search([('name','=',self.name)])
+				if check_double:
+					check_double.unlink()
+
+				for rec in self.tenant_id:
+					if rec.citizen:
+						tax = (int(rec.rent)/100) * 10
+					else:
+						tax = (int(rec.rent)/100) * 15
+					
+					rec.name.building_rent_id.create({
+						"name" : self.id,
+						"property_name" : self.property_name,
+						"rental_tax" : tax,
+						"tenant_form_id" : rec.name.id
+
+						})
+					if self.user_has_groups('textit_sms_service.group_sms_form'):
+						number = '+225'+rec.name.mobile[1:]
+						message = "Name : %s,TIN : %s,NIC : %s,PID : %s,Address : %s,Rental Tax : %s TZS" %(
+							rec.name.name,
+							rec.name.tin,
+							rec.name.identification_id,
+							self.name,
+							self.street_sc.name,
+							"%.2f" % round(tax)
+							)
+						_logger.info('Sending message : '+message+' on Number : '+number)
+
+						self.env['sms.templates'].send_sms(number = number,message=message)
+
+
+			# -----------------------------------------------------------
+			self.write({'state': 'verified'})
 		else:
 			raise ValidationError(_("Please Update information before proceed."))
 
@@ -535,6 +617,12 @@ class BuildingData(models.Model):
 	# Adding constrant for uniqe name per record.
 	#####################################################
 
+	@api.multi
+	def copy(self, default=None):
+		self.ensure_one()
+		default = dict(default or {}, name=_('%s (copy)') % self.name)
+		return super(BuildingData, self).copy(default)
+
 	_sql_constraints = [
         (
         	'uniq_name', 
@@ -543,6 +631,7 @@ class BuildingData(models.Model):
         ),
     ]
 
+
 class BuildingOwnerLine(models.Model):
 	_name = 'building.owner.line'
 	
@@ -550,7 +639,7 @@ class BuildingOwnerLine(models.Model):
 	# Below varibles are Owner relation with Building.
 	#####################################################
 
-	name = fields.Many2one('res.partner', domain=[('owner', '=', True)])
+	name = fields.Many2one('res.partner', domain=[('owner', '=', True)], required=True)
 	identification_id = fields.Char("Identification No", related='name.identification_id')
 	area_own = fields.Float(digits=dp.get_precision('Area Own by Owner'))
 	type_id = fields.Selection([
@@ -562,24 +651,24 @@ class BuildingOwnerLine(models.Model):
 
 	building_data_id = fields.Many2one('building.data',  ondelete='cascade')
 
-class BuildingTanentLine(models.Model):
-	_name = 'building.tanent.line'
+class BuildingtenantLine(models.Model):
+	_name = 'building.tenant.line'
 	
 	#####################################################
-	# Below varibles are Tanent relation with Building.
+	# Below varibles are tenant relation with Building.
 	#####################################################
 
-	name = fields.Many2one('res.partner', domain=[('tenant', '=', True)])
-	owner = fields.Many2one('res.partner')
-	identification_id = fields.Char("Identification No", related='name.identification_id')
-	citizen = fields.Boolean()
+	name = fields.Many2one('res.partner', domain=[('tenant', '=', True)], required=True)
+	owner = fields.Many2one('res.partner', required=True)
+	identification_id = fields.Char("Identification No", related='name.identification_id', required=True)
+	citizen = fields.Boolean(default=True)
 	type_id = fields.Selection([
         ('commercial', 'Commercial'),
         ('residential', 'Residential'),
-        ('construction', 'Construction')
-        ], string= "Area Type")
-	rent = fields.Float(digits=dp.get_precision('Rent Amount'))
-
+        # ('construction', 'Construction')
+        ], string= "Area Type" , required=True)
+	rent = fields.Char(required=True)
+	# rent = fields.Float(digits=dp.get_precision('Rent Amount'))
 
 	building_data_id = fields.Many2one('building.data',  ondelete='cascade')
 
